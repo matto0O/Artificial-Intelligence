@@ -9,24 +9,25 @@ class Departure():
     Edge for the public transport graph, representing a route between two stops.
     -
     line - Symbol of a mean of public transport\n
-    d_time - Departure time in minutes (7:30AM -> 450)\n
-    a_time - Arrival time in minutes\n
-    destination - Name of the destination stop
+    departure_time - Departure time in minutes (7:30AM -> 450)\n
+    arrival_time - Arrival time in minutes\n
+    start - Name of the stop where the line departs\n
+    destination - Name of the destination stop\n
+    length - Travel time in minutes
     """
     def __init__(self, info: pd.Series):
         self.line:str = info['line']
-        self.d_time = _timeToTotal(info['departure_time'])
-        self.destination = info['end_stop'].lower()
-        self.a_time = _timeToTotal(info['arrival_time'])
+        self.start = info['start_stop'].lower().capitalize()
+        self.departure_time = _timeToTotal(info['departure_time'])
+        self.destination = info['end_stop'].lower().capitalize()
+        self.arrival_time = _timeToTotal(info['arrival_time'])
+        self.length = self.arrival_time - self.departure_time
 
     def __str__(self):
-        return f"{self.line} odjeżdżające o {int(self.d_time/60)}:{self.d_time%60} dotrze do {self.destination} o {int(self.a_time/60)}:{self.a_time%60}"
+        return f"{self.line} odjeżdżające o {int(self.departure_time/60)}:{self.departure_time%60} z {self.start} dotrze do {self.destination} o {int(self.arrival_time/60)}:{self.arrival_time%60}"
     
-    def deltaTime(self):
-        """
-        Time length of a ride in minutes
-        """
-        return self.a_time - self.d_time
+    def __eq__(self, __o: object) -> bool:
+        return self.line==__o.line and self.destination==__o.destination and self.departure_time==__o.d_time
 
 class Stop():
     """
@@ -40,6 +41,7 @@ class Stop():
         self.name = name
         self.posts = list(posts)
         self.departures = list()
+        self.g = self.h = self.f = 0
 
     def __str__(self):
         return self.name
@@ -50,8 +52,20 @@ class Stop():
     def addDeparture(self, info:pd.Series):
         self.departures.append(Departure(info))
         
-    def manhattanDistance(self, end_stop):
+    def setHeuristic(self, end_stop):
+        """
+        Setter for heuristic value, using Manhattan Distance.\n
+        Updates total f value.
+        """
         this_x, this_y = self.posts[0]
         end_x, end_y = end_stop.posts[0]
-        return abs(this_x-end_x) + abs(this_y-end_y)
+        self.h = abs(this_x-end_x) + abs(this_y-end_y)
+        self.f = self.h + self.g
 
+    def setG(self, g):
+        """
+        Setter for graph related value.\n
+        Updates total f value.
+        """
+        self.g = g
+        self.f = self.g + self.h
