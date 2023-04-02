@@ -1,16 +1,4 @@
-def findStopOfName(graph, node_name):
-    try:
-        return [stop for stop in graph if stop.name==node_name.lower()][0]
-    except IndexError:
-        print("Nie ma takiego przystanku")
-        exit(0)
-
-def findWrapperByName(graph, node_name):
-    try:
-        return [stop for stop in graph if stop.obj.name==node_name.lower()][0]
-    except IndexError:
-        print("Nie ma takiego przystanku")
-        exit(0)
+from structures import findStopOfName
 
 def asa(graph_stale, start_name, end_name, start_time):
     """

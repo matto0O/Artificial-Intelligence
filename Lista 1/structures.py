@@ -1,8 +1,15 @@
 import pandas as pd
 
-def _timeToTotal(time):
+def timeToTotal(time):
     split = time[:6].split(':')
     return int(split[0])*60 + int(split[1])
+
+def findStopOfName(graph, node_name):
+    try:
+        return [stop for stop in graph if stop.name==node_name.lower()][0]
+    except IndexError:
+        print("Nie ma takiego przystanku")
+        exit(0)
 
 class Departure():
     """
@@ -18,9 +25,9 @@ class Departure():
     def __init__(self, info: pd.Series):
         self.line:str = info['line']
         self.start = info['start_stop'].lower().capitalize()
-        self.departure_time = _timeToTotal(info['departure_time'])
+        self.departure_time = timeToTotal(info['departure_time'])
         self.destination = info['end_stop'].lower().capitalize()
-        self.arrival_time = _timeToTotal(info['arrival_time'])
+        self.arrival_time = timeToTotal(info['arrival_time'])
         self.length = self.arrival_time - self.departure_time
 
     def __str__(self):
@@ -49,6 +56,9 @@ class Stop():
     def __eq__(self, __o: object):
         return self.name == str(__o)
     
+    def __hash__(self):
+        return hash(self.name)
+    
     def addDeparture(self, info:pd.Series):
         self.departures.append(Departure(info))
         
@@ -69,3 +79,17 @@ class Stop():
         """
         self.g = g
         self.f = self.g + self.h
+
+class PriorityQueue:
+    def __init__(self):
+        self.elements = []
+
+    def empty(self) -> bool:
+        return not self.elements
+
+    def put(self, item, priority):
+        self.elements.append((item,priority))
+
+    def get(self):
+        self.elements.sort(key=lambda x:x[1])
+        return self.elements.pop(0)[0]
