@@ -24,9 +24,9 @@ class Departure():
     """
     def __init__(self, info: pd.Series):
         self.line:str = info['line']
-        self.start = info['start_stop'].lower().capitalize()
+        self.start = info['start_stop'].lower()
         self.departure_time = timeToTotal(info['departure_time'])
-        self.destination = info['end_stop'].lower().capitalize()
+        self.destination = info['end_stop'].lower()
         self.arrival_time = timeToTotal(info['arrival_time'])
         self.length = self.arrival_time - self.departure_time
 
@@ -51,6 +51,9 @@ class Stop():
         self.g = self.h = self.f = 0
 
     def __str__(self):
+        return self.name
+    
+    def __repr__(self) -> str:
         return self.name
 
     def __eq__(self, __o: object):
@@ -88,7 +91,8 @@ class PriorityQueue:
         return not self.elements
 
     def put(self, item, priority):
-        self.elements.append((item,priority))
+        self.elements = [tup for tup in self.elements if tup[0] != item]
+        self.elements.append((item, priority))
 
     def get(self):
         self.elements.sort(key=lambda x:x[1])

@@ -33,23 +33,12 @@ def dijkstra(graph, start, end, departure_time):
             # all departures that take place after (start departure time + time to get to current_stop)
             destination = findStopOfName(graph, departure.destination)
 
-            #print(destination, tracker[destination], (tracker[current_stop][1] + departure.length))
-
-            if destination.name == "wawrzyniaka":
-                pass
-
-            if not tracker[destination][0]:
-                #print("ifnot")
-                tracker[destination] = (tracker[current_stop][0] + [current_stop], tracker[current_stop][1] + departure.length)
-            elif tracker[destination][1] > (tracker[current_stop][1] + departure.length):
-                #print("elif")
-                #print(tracker[destination][0] + [current_stop], tracker[destination][1] + departure.length)
-                tracker[destination] = (tracker[destination][0] + [current_stop], tracker[destination][1] + departure.length)
-            else:
+            if destination.name in [current_stop.name, tracker[current_stop][0][-1]]:
                 continue
-            q.put(destination, tracker[destination][1])
-            #print("\n")
-    
+
+            if not tracker[destination][0] or tracker[destination][1] > (tracker[current_stop][1] + departure.length):
+                tracker[destination] = (tracker[current_stop][0] + [current_stop], tracker[current_stop][1] + departure.length)
+                q.put(destination, tracker[destination][1])
     return
 
 
@@ -63,3 +52,8 @@ def preetifyResult(res, start, stop):
     print(f"Trasa od {start} do {stop}:")
     print(result_str)
     print(f"Zajmie {time}")
+
+def eligibleDepartures(current_stop, departures, tracker_tuple, departure_time):
+    eligible = filter(lambda x: (x.departure_time>=departure_time+tracker_tuple[1]), current_stop.departures)
+    eligible = filter
+    
