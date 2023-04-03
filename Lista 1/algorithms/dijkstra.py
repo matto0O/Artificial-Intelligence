@@ -1,4 +1,4 @@
-from structures import PriorityQueue, findStopOfName, timeToTotal
+from structures import PriorityQueue, findStopOfName, timeToTotal, findDepartureBetween, Stop, Departure
 
 def dijkstra(graph, start, end, departure_time):
 
@@ -10,11 +10,11 @@ def dijkstra(graph, start, end, departure_time):
     q.put(start_node, 0)
     visited = set()
 
-    tracker = {stop: ([], float('inf')) for stop in graph}
+    tracker = {stop: (Stop, float('inf'), int) for stop in graph}
     # dict storing current best paths to a node, where:
     # first elem - path to node
     # second elem - path length
-    tracker[start_node] = ([start_node], 0)
+    tracker[start_node] = (None, 0, time_total)
 
     while not q.empty():
         current_stop = q.get()
@@ -25,35 +25,38 @@ def dijkstra(graph, start, end, departure_time):
             visited.add(current_stop)
 
         if current_stop == stop_node:
-            tracker[current_stop] = ((tracker[current_stop][0] + [current_stop])[1:], tracker[current_stop][1])
-            preetifyResult(tracker[current_stop], start_node, stop_node)
+            # path reconstruction
+            stopA = tracker[current_stop][0]
+            stopB = current_stop
+            departures = []
+            while stopA != start_node:
+                departures.append(findDepartureBetween(stopA, stopB, tracker[stopB][2]))
+                stopA, stopB = tracker[stopA][0], stopA
+            departures.append(findDepartureBetween(stopA, stopB, tracker[stopB][2]))
+            #preetifyResult(tracker[current_stop], start_node, stop_node)
             return
 
-        for departure in filter(lambda x: (x.departure_time>=time_total+tracker[current_stop][1]), current_stop.departures):
-            # all departures that take place after (start departure time + time to get to current_stop)
+        for departure in filter(lambda x: (x.departure_time>=tracker[current_stop][2]), current_stop.departures):
+            # all departures that take place after current_stop arrival time
             destination = findStopOfName(graph, departure.destination)
-
-            if destination.name in [current_stop.name, tracker[current_stop][0][-1]]:
+            if destination.name in [current_stop.name, tracker[current_stop][0]]:
                 continue
+            time_cost = departure.timeCriteria(time_total)
 
-            if not tracker[destination][0] or tracker[destination][1] > (tracker[current_stop][1] + departure.length):
-                tracker[destination] = (tracker[current_stop][0] + [current_stop], tracker[current_stop][1] + departure.length)
-                q.put(destination, tracker[destination][1])
+            if not tracker[destination][0] or time_cost < tracker[destination][1]:
+                tracker[destination] = (current_stop, time_cost, departure.arrival_time)
+                q.put(destination, time_cost)
     return
 
 
 def preetifyResult(res, start, stop):
-    stops, time = res
-    result_str = ""
-    for i, stop in enumerate(stops):
-        result_str += stop.name
-        if(i < len(stops) - 1):
-            result_str += '-'
-    print(f"Trasa od {start} do {stop}:")
-    print(result_str)
-    print(f"Zajmie {time}")
-
-def eligibleDepartures(current_stop, departures, tracker_tuple, departure_time):
-    eligible = filter(lambda x: (x.departure_time>=departure_time+tracker_tuple[1]), current_stop.departures)
-    eligible = filter
-    
+    print(res)
+    # last_stop, time, departure = res
+    # result_str = ""
+    # for i, stop in enumerate(last_stop):
+    #     result_str += stop.name
+    #     if(i < len(last_stop) - 1):
+    #         result_str += '-'
+    # print(f"Trasa od {start} do {stop}:")
+    # print(result_str)
+    # print(f"Zajmie {time}")    

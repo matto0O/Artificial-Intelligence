@@ -34,3 +34,4 @@ def fullLoad():
     graph = fetchNodes()
     fetchEdges(graph)
     saveGraph(graph)
+    print("Done!")

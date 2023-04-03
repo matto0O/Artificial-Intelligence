@@ -1,5 +1,12 @@
 import pandas as pd
 
+def findDepartureBetween(start, stop, arrival):
+    for departure in start.departures:
+        print(departure.destination, stop, departure.arrival_time, arrival)
+        if departure.destination==stop and departure.arrival_time==arrival:
+            return departure
+    exit(1)
+
 def timeToTotal(time):
     split = time[:6].split(':')
     return int(split[0])*60 + int(split[1])
@@ -35,6 +42,9 @@ class Departure():
     
     def __eq__(self, __o: object) -> bool:
         return self.line==__o.line and self.destination==__o.destination and self.departure_time==__o.d_time
+    
+    def timeCriteria(self, start_time):
+        return self.arrival_time - start_time
 
 class Stop():
     """
@@ -45,7 +55,7 @@ class Stop():
     departures - all of the departures from this group of stops
     """
     def __init__(self, name, posts):
-        self.name = name
+        self.name = name.lower()
         self.posts = list(posts)
         self.departures = list()
         self.g = self.h = self.f = 0
@@ -82,6 +92,18 @@ class Stop():
         """
         self.g = g
         self.f = self.g + self.h
+
+def binary_search(arr, target):
+    low, high = 0, len(arr) - 1
+    while low <= high:
+        mid = (low + high) // 2
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return -1
 
 class PriorityQueue:
     def __init__(self):
