@@ -1,4 +1,4 @@
-from structures import PriorityQueue, Stop, findStopOfName, timeToTotal, findDepartureBetween, toReadableTime, preetifyResult
+from structures import PriorityQueue, Stop, findStopOfName, timeToTotal, findDepartureBetween, preetifyResult
 import time
 
 def dijkstra(graph, start, end, departure_time):

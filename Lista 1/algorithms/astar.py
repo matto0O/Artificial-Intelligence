@@ -1,4 +1,4 @@
-from structures import PriorityQueue, Stop, findStopOfName, timeToTotal, findDepartureBetween, toReadableTime
+from structures import PriorityQueue, Stop, findStopOfName, timeToTotal, findDepartureBetween, preetifyResult
 import time
 
 def asaTimeCriteria(graph, start, end, departure_time):
