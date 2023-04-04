@@ -2,7 +2,6 @@ import pandas as pd
 from collections import defaultdict
 from structures import Stop
 import pickle
-from algorithms.astar import asa
 
 df = pd.read_csv('connection_graph.csv', index_col=0)
 FILENAME = "graph.pkl"

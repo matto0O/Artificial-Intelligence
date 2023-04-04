@@ -1,6 +1,16 @@
-from structures import PriorityQueue, findStopOfName, timeToTotal, findDepartureBetween, toReadableTime, Stop, Departure
+from structures import PriorityQueue, Stop, findStopOfName, timeToTotal, findDepartureBetween, toReadableTime
+import time
 
 def dijkstra(graph, start, end, departure_time):
+    """
+    Implementation of a Dijkstra algorithm
+    -
+    graph - graph used to browse for an optimal route\n
+    start - starting stop name\n
+    end - end goal\n
+    departure_time - the earliest time to hop onto a bus/tram
+    """
+    computing_time_start = time.time()
 
     start_node = findStopOfName(graph, start)
     stop_node = findStopOfName(graph, end)
@@ -35,6 +45,7 @@ def dijkstra(graph, start, end, departure_time):
             departures.append(findDepartureBetween(stopA, stopB, tracker[stopB][2]))
             departures.reverse()
             preetifyResult(departures)
+            print(f"Czas wykonywania obliczeń - {time.time()-computing_time_start}s")
             return
 
         for departure in filter(lambda x: (x.departure_time>=tracker[current_stop][2]), current_stop.departures):
