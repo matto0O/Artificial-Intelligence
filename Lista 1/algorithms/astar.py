@@ -1,6 +1,15 @@
 from structures import PriorityQueue, Stop, findStopOfName, timeToTotal, findDepartureBetween, preetifyResult
 import time
 
+def aStar(graph, start, end, departure_time, criteria):
+    match criteria:
+        case 't':
+            asaTimeCriteria(graph,start,end,departure_time)
+        case 'p':
+            asaTransferCriteria(graph,start,end,departure_time)
+        case _:
+            print("Nie ma takiego kryterium")
+
 def asaTimeCriteria(graph, start, end, departure_time):
     """
     Implementation of an A* Algorithm using time criteria
