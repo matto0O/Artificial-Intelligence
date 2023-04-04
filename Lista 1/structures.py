@@ -110,3 +110,13 @@ class PriorityQueue:
 
     def get(self):
         return heapq.heappop(self.elements)[1]
+
+def preetifyResult(res):
+    print("=======================================================")
+    transfers = set()
+    for departure in res:
+        transfers.add(departure.line)
+        print(f"{departure.start} -> {departure.destination}, linia {departure.line}, odjazd o {toReadableTime(departure.departure_time)}, przyjazd o {toReadableTime(departure.arrival_time)}")
+    print(f"Docierasz do przystanku o {toReadableTime(res[-1].arrival_time)} po {res[-1].departure_time-res[0].departure_time} minutach.")
+    print(f"Ilość przesiadek - {len(transfers)-1}")
+    print("=======================================================")

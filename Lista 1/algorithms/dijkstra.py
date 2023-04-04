@@ -1,4 +1,4 @@
-from structures import PriorityQueue, Stop, findStopOfName, timeToTotal, findDepartureBetween, toReadableTime
+from structures import PriorityQueue, Stop, findStopOfName, timeToTotal, findDepartureBetween, toReadableTime, preetifyResult
 import time
 
 def dijkstra(graph, start, end, departure_time):
@@ -49,7 +49,7 @@ def dijkstra(graph, start, end, departure_time):
             return
         
         collection = set(filter(lambda x: (x.departure_time>=tracker[current_stop][2]), current_stop.departures))
-        
+
         for departure in collection:
             # all departures that take place after current_stop arrival time
             destination = findStopOfName(graph, departure.destination)
@@ -61,14 +61,3 @@ def dijkstra(graph, start, end, departure_time):
                 tracker[destination] = (current_stop, time_cost, departure.arrival_time)
                 q.put(destination, time_cost)
     return
-
-
-def preetifyResult(res):
-    print("=======================================================")
-    transfers = set()
-    for departure in res:
-        transfers.add(departure.line)
-        print(f"{departure.start} -> {departure.destination}, linia {departure.line}, odjazd o {toReadableTime(departure.departure_time)}, przyjazd o {toReadableTime(departure.arrival_time)}")
-    print(f"Docierasz do przystanku o {toReadableTime(res[-1].arrival_time)} po {res[-1].departure_time-res[0].departure_time} minutach.")
-    print(f"Ilość przesiadek - {len(transfers)-1}")
-    print("=======================================================")

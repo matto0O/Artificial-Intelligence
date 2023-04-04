@@ -124,13 +124,3 @@ def asaTransferCriteria(graph, start, end, departure_time):
                 q.put(destination, time_cost + current_stop.getHeuristic(destination))
         current_time += tracker[current_stop][1]
     return
-
-def preetifyResult(res):
-    print("=======================================================")
-    transfers = set()
-    for departure in res:
-        transfers.add(departure.line)
-        print(f"{departure.start} -> {departure.destination}, linia {departure.line}, odjazd o {toReadableTime(departure.departure_time)}, przyjazd o {toReadableTime(departure.arrival_time)}")
-    print(f"Docierasz do przystanku o {toReadableTime(res[-1].arrival_time)} po {res[-1].departure_time-res[0].departure_time} minutach.")
-    print(f"Ilość przesiadek - {len(transfers)-1}")
-    print("=======================================================")
