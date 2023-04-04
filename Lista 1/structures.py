@@ -1,6 +1,6 @@
 import pandas as pd
 import heapq
-import time
+from math import sqrt
 
 def findDepartureBetween(start, stop, arrival):
     for departure in start.departures:
@@ -35,9 +35,9 @@ class Departure():
     """
     def __init__(self, info: pd.Series):
         self.line:str = info['line']
-        self.start = info['start_stop'].lower()
+        self.start = info['start_stop']
         self.departure_time = timeToTotal(info['departure_time'])
-        self.destination = info['end_stop'].lower()
+        self.destination = info['end_stop']
         self.arrival_time = timeToTotal(info['arrival_time'])
         self.length = self.arrival_time - self.departure_time
 
@@ -45,7 +45,10 @@ class Departure():
         return f"{self.line} odjeżdżające o {int(self.departure_time/60)}:{self.departure_time%60} z {self.start} dotrze do {self.destination} o {int(self.arrival_time/60)}:{self.arrival_time%60}"
     
     def __eq__(self, __o: object) -> bool:
-        return self.line==__o.line and self.destination==__o.destination and self.departure_time==__o.d_time
+        return self.line==__o.line and self.destination==__o.destination# and self.departure_time==__o.d_time
+    
+    def __hash__(self) -> int:
+        return hash(self.__str__)
     
     def timeCriteria(self, start_time):
         return self.arrival_time - start_time
@@ -63,7 +66,7 @@ class Stop():
     departures - all of the departures from this group of stops
     """
     def __init__(self, name, posts):
-        self.name = name.lower()
+        self.name = name
         self.posts = list(posts)
         self.departures = list()
 
@@ -90,10 +93,10 @@ class Stop():
         Getter for heuristic value, using Manhattan Distance.\n
         Updates total f value.
         """
-        MULTPLIER = 200
+        MULTPLIER = 300
         this_x, this_y = self.posts[0]
         end_x, end_y = end_stop.posts[0]
-        return MULTPLIER * (abs(this_x-end_x) + abs(this_y-end_y))
+        return MULTPLIER * (sqrt(abs(this_x-end_x) + abs(this_y-end_y)))
 
 class PriorityQueue:
     def __init__(self):

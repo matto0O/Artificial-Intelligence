@@ -47,8 +47,10 @@ def dijkstra(graph, start, end, departure_time):
             preetifyResult(departures)
             print(f"Czas wykonywania obliczeń - {time.time()-computing_time_start}s")
             return
-
-        for departure in filter(lambda x: (x.departure_time>=tracker[current_stop][2]), current_stop.departures):
+        
+        collection = set(filter(lambda x: (x.departure_time>=tracker[current_stop][2]), current_stop.departures))
+        
+        for departure in collection:
             # all departures that take place after current_stop arrival time
             destination = findStopOfName(graph, departure.destination)
             if destination.name in [current_stop.name, tracker[current_stop][0]]:
@@ -62,10 +64,11 @@ def dijkstra(graph, start, end, departure_time):
 
 
 def preetifyResult(res):
-    trip_time = 0
     print("=======================================================")
+    transfers = set()
     for departure in res:
-        trip_time += departure.length
-        print(f"{departure.start.capitalize()} -> {departure.destination.capitalize()}, linia {departure.line}, odjazd o {toReadableTime(departure.departure_time)}, przyjazd o {toReadableTime(departure.arrival_time)}")
-    print(f"Docierasz do przystanku o {toReadableTime(res[-1].arrival_time)} po {trip_time} minutach jazdy")
+        transfers.add(departure.line)
+        print(f"{departure.start} -> {departure.destination}, linia {departure.line}, odjazd o {toReadableTime(departure.departure_time)}, przyjazd o {toReadableTime(departure.arrival_time)}")
+    print(f"Docierasz do przystanku o {toReadableTime(res[-1].arrival_time)} po {res[-1].departure_time-res[0].departure_time} minutach.")
+    print(f"Ilość przesiadek - {len(transfers)-1}")
     print("=======================================================")
