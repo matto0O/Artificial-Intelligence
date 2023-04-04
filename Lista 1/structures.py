@@ -2,7 +2,6 @@ import pandas as pd
 
 def findDepartureBetween(start, stop, arrival):
     for departure in start.departures:
-        print(departure.destination, stop, departure.arrival_time, arrival)
         if departure.destination==stop and departure.arrival_time==arrival:
             return departure
     exit(1)
@@ -10,6 +9,9 @@ def findDepartureBetween(start, stop, arrival):
 def timeToTotal(time):
     split = time[:6].split(':')
     return int(split[0])*60 + int(split[1])
+
+def toReadableTime(time):
+    return f"{int(time/60)}:{str(time%60).zfill(2)}"
 
 def findStopOfName(graph, node_name):
     try:

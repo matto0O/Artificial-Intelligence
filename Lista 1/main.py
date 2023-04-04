@@ -5,4 +5,4 @@ if __name__=="__main__":
     #fullLoad()
     city = readGraph()
     #asa(city, "krzyki", "racławicka")
-    dijkstra(city, "tarnogaj", "wapienna", "10:00:00")
+    dijkstra(city, "leśnica", "księże małe", "10:00:00")

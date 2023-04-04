@@ -1,4 +1,4 @@
-from structures import PriorityQueue, findStopOfName, timeToTotal, findDepartureBetween, Stop, Departure
+from structures import PriorityQueue, findStopOfName, timeToTotal, findDepartureBetween, toReadableTime, Stop, Departure
 
 def dijkstra(graph, start, end, departure_time):
 
@@ -33,7 +33,8 @@ def dijkstra(graph, start, end, departure_time):
                 departures.append(findDepartureBetween(stopA, stopB, tracker[stopB][2]))
                 stopA, stopB = tracker[stopA][0], stopA
             departures.append(findDepartureBetween(stopA, stopB, tracker[stopB][2]))
-            #preetifyResult(tracker[current_stop], start_node, stop_node)
+            departures.reverse()
+            preetifyResult(departures)
             return
 
         for departure in filter(lambda x: (x.departure_time>=tracker[current_stop][2]), current_stop.departures):
@@ -49,14 +50,11 @@ def dijkstra(graph, start, end, departure_time):
     return
 
 
-def preetifyResult(res, start, stop):
-    print(res)
-    # last_stop, time, departure = res
-    # result_str = ""
-    # for i, stop in enumerate(last_stop):
-    #     result_str += stop.name
-    #     if(i < len(last_stop) - 1):
-    #         result_str += '-'
-    # print(f"Trasa od {start} do {stop}:")
-    # print(result_str)
-    # print(f"Zajmie {time}")    
+def preetifyResult(res):
+    trip_time = 0
+    print("=======================================================")
+    for departure in res:
+        trip_time += departure.length
+        print(f"{departure.start.capitalize()} -> {departure.destination.capitalize()}, linia {departure.line}, odjazd o {toReadableTime(departure.departure_time)}, przyjazd o {toReadableTime(departure.arrival_time)}")
+    print(f"Docierasz do przystanku o {toReadableTime(res[-1].arrival_time)} po {trip_time} minutach jazdy")
+    print("=======================================================")
