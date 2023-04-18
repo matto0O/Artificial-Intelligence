@@ -1,4 +1,4 @@
-from structures import PriorityQueue, Stop, findStopOfName, timeToTotal, findDepartureBetween, preetifyResult
+from structures import *
 import time
 
 def aStar(graph, start, end, departure_time, criteria):
@@ -29,11 +29,11 @@ def asaTimeCriteria(graph, start, end, departure_time):
     q.put(start_node, 0)
     visited = set()
 
-    tracker = {stop: (Stop, float('inf'), int) for stop in graph}
+    tracker = {stop: (Stop, float('inf'), int,str) for stop in graph}
     # dict storing current best paths to a node, where:
     # first elem - path to node
     # second elem - path length
-    tracker[start_node] = (None, 0, time_total)
+    tracker[start_node] = (None, 0, time_total, None)
 
     while not q.empty():
         current_stop = q.get()
@@ -45,8 +45,9 @@ def asaTimeCriteria(graph, start, end, departure_time):
 
         if current_stop == stop_node:
             # path reconstruction
-            stopA = tracker[current_stop][0]
             stopB = current_stop
+            #tracker = checkForTransferAvoidance(tracker, stopB, start)
+            stopA = tracker[current_stop][0]
             departures = []
             while stopA != start_node:
                 departures.append(findDepartureBetween(stopA, stopB, tracker[stopB][2]))
@@ -67,11 +68,14 @@ def asaTimeCriteria(graph, start, end, departure_time):
             if x not in checked_departures:
                 checked_departures.add(x)
                 destination = findStopOfName(graph, departure.destination)
+
+                transfer = departure.line != tracker[current_stop][3]
+
                 if destination.name not in [current_stop.name, tracker[current_stop][0]]:
-                    time_cost = departure.timeCriteria(time_total)
+                    time_cost = departure.timeCriteria(time_total, transfer)
 
                     if not tracker[destination][0] or time_cost < tracker[destination][1]:
-                        tracker[destination] = (current_stop, time_cost, departure.arrival_time)
+                        tracker[destination] = (current_stop, time_cost, departure.arrival_time, departure.line)
                         q.put(destination, time_cost + current_stop.getHeuristic(destination))
     return
 
@@ -98,7 +102,7 @@ def asaTransferCriteria(graph, start, end, departure_time):
     # dict storing current best paths to a node, where:
     # first elem - path to node
     # second elem - path length
-    tracker[start_node] = (None, 0, time_total, None)
+    tracker[start_node] = (None, 0, time_total, None, None)
 
     while not q.empty():
         current_stop = q.get()
@@ -111,8 +115,9 @@ def asaTransferCriteria(graph, start, end, departure_time):
 
         if current_stop == stop_node:
             # path reconstruction
-            stopA = tracker[current_stop][0]
             stopB = current_stop
+            #tracker = checkForTransferAvoidance(tracker, stopB, start)
+            stopA = tracker[current_stop][0]
             departures = []
             while stopA != start_node:
                 departures.append(findDepartureBetween(stopA, stopB, tracker[stopB][2]))
@@ -138,6 +143,8 @@ def asaTransferCriteria(graph, start, end, departure_time):
             
                 if destination.name not in [current_stop.name, tracker[current_stop][0]]:
                     time_cost = departure.transferCriteria(current_time, transfer)
+                    if departure.start=="Bajana":
+                        print(departure.line, departure.start, departure.destination, time_cost)
             
                     if not tracker[destination][0] or time_cost < tracker[destination][1]:
                         tracker[destination] = (current_stop, time_cost, departure.arrival_time, departure.line)

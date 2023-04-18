@@ -3,14 +3,28 @@ import heapq
 from math import sqrt
 
 def findDepartureBetween(start, stop, arrival):
-    #return [departure for departure in start.departures if (departure.destination==stop and departure.arrival_time==arrival)][0]
     for departure in start.departures:
         if departure.destination==stop and departure.arrival_time==arrival:
             return departure
-    exit(1)
+    return None
 
-def checkForTransferAvoidance(tracker):
-    pass
+def findDepartureBetweenOfLine(start, stop, line, arrival):
+    collection = sorted(filter(lambda x: x.arrival_time<=arrival, start.departures), key=lambda x:x.arrival_time, reverse=True)
+    for departure in collection:
+        if departure.destination==stop and departure.line==line:
+            return departure
+    return None
+
+def checkForTransferAvoidance(tracker, transfer_stop, start_stop):
+    prev_stop, _, arrival_time, line = tracker[transfer_stop]
+    prev_tracker = tracker[prev_stop]
+    if prev_tracker[-1] != line:
+        res = findDepartureBetweenOfLine(prev_tracker[0], prev_stop, line, arrival_time)
+        if res is not None and abs(res.arrival_time - arrival_time) < 10:
+            tracker[prev_stop] = prev_tracker[0], res.length, res.arrival_time, res.line
+    if not (prev_stop is None or transfer_stop.name==start_stop):
+        checkForTransferAvoidance(tracker, prev_stop,start_stop)
+    return tracker
 
 def timeToTotal(time):
     split = time[:6].split(':')
@@ -54,8 +68,9 @@ class Departure():
     def __hash__(self) -> int:
         return hash(self.__str__)
     
-    def timeCriteria(self, start_time):
-        return self.arrival_time - start_time
+    def timeCriteria(self, start_time, transfered):
+        TRANSFER_THRESHOLD = 1
+        return self.arrival_time - start_time + (TRANSFER_THRESHOLD if transfered else 0)
     
     def transferCriteria(self, start_time, transfered):
         TRANSFER_THRESHOLD = 10
@@ -97,7 +112,7 @@ class Stop():
         Getter for heuristic value, using Manhattan Distance.\n
         Updates total f value.
         """
-        MULTPLIER = 300
+        MULTPLIER = 15
         this_x, this_y = self.posts[0]
         end_x, end_y = end_stop.posts[0]
         return MULTPLIER * (sqrt(abs(this_x-end_x) + abs(this_y-end_y)))
@@ -116,11 +131,11 @@ class PriorityQueue:
         return heapq.heappop(self.elements)[1]
 
 def preetifyResult(res):
-    print("=======================================================")
+    print("".ljust(110, '='))
     transfers = set()
     for departure in res:
         transfers.add(departure.line)
-        print(f"{departure.start} -> {departure.destination}, linia {departure.line}, odjazd o {toReadableTime(departure.departure_time)}, przyjazd o {toReadableTime(departure.arrival_time)}")
-    print(f"Docierasz do przystanku o {toReadableTime(res[-1].arrival_time)} po {res[-1].departure_time-res[0].departure_time} minutach.")
+        print(f"{departure.start.rjust(40)} -> {departure.destination.ljust(40)} linia {str(departure.line).ljust(3)} {str(toReadableTime(departure.departure_time)).ljust(5)} -> {str(toReadableTime(departure.arrival_time)).rjust(5)}")
+    #print(f"Docierasz do przystanku o {toReadableTime(res[-1].arrival_time)} po {res[-1].departure_time-res[0].departure_time} minutach.")
     print(f"Ilość przesiadek - {len(transfers)-1}")
-    print("=======================================================")
+    print("".ljust(110, '='))
