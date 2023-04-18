@@ -57,17 +57,22 @@ def asaTimeCriteria(graph, start, end, departure_time):
             print(f"Czas wykonywania obliczeń - {time.time()-computing_time_start}s")
             return
 
-        for departure in filter(lambda x: (x.departure_time>=tracker[current_stop][2]), current_stop.departures):
-            comp = time.time()
-            # all departures that take place after current_stop arrival time
-            destination = findStopOfName(graph, departure.destination)
-            if destination.name in [current_stop.name, tracker[current_stop][0]]:
-                continue
-            time_cost = departure.timeCriteria(time_total)
+        collection = sorted(filter(lambda x: (x.departure_time>=tracker[current_stop][2]), current_stop.departures), key=lambda x: x.departure_time)
 
-            if not tracker[destination][0] or time_cost < tracker[destination][1]:
-                tracker[destination] = (current_stop, time_cost, departure.arrival_time)
-                q.put(destination, time_cost + current_stop.getHeuristic(destination))
+        checked_departures = set()
+
+        for departure in collection:
+            # all departures that take place after current_stop arrival time
+            x = (departure.line, departure.destination)
+            if x not in checked_departures:
+                checked_departures.add(x)
+                destination = findStopOfName(graph, departure.destination)
+                if destination.name not in [current_stop.name, tracker[current_stop][0]]:
+                    time_cost = departure.timeCriteria(time_total)
+
+                    if not tracker[destination][0] or time_cost < tracker[destination][1]:
+                        tracker[destination] = (current_stop, time_cost, departure.arrival_time)
+                        q.put(destination, time_cost + current_stop.getHeuristic(destination))
     return
 
 def asaTransferCriteria(graph, start, end, departure_time):
@@ -118,18 +123,24 @@ def asaTransferCriteria(graph, start, end, departure_time):
             print(f"Czas wykonywania obliczeń - {time.time()-computing_time_start}s")
             return
 
-        for departure in filter(lambda x: (x.departure_time>=tracker[current_stop][2]), current_stop.departures):
-            # all departures that take place after current_stop arrival time
-            destination = findStopOfName(graph, departure.destination)
+        collection = sorted(filter(lambda x: (x.departure_time>=tracker[current_stop][2]), current_stop.departures), key=lambda x: x.departure_time)
 
-            transfer = departure.line != tracker[current_stop][3]
+        checked_departures = set()
+
+        for departure in collection:
+            # all departures that take place after current_stop arrival time
+            x = (departure.line, departure.destination)
+            if x not in checked_departures:
+                checked_departures.add(x)
+                destination = findStopOfName(graph, departure.destination)
+
+                transfer = departure.line != tracker[current_stop][3]
             
-            if destination.name in [current_stop.name, tracker[current_stop][0]]:
-                continue
-            time_cost = departure.transferCriteria(current_time, transfer)
-    
-            if not tracker[destination][0] or time_cost < tracker[destination][1]:
-                tracker[destination] = (current_stop, time_cost, departure.arrival_time, departure.line)
-                q.put(destination, time_cost + current_stop.getHeuristic(destination))
+                if destination.name not in [current_stop.name, tracker[current_stop][0]]:
+                    time_cost = departure.transferCriteria(current_time, transfer)
+            
+                    if not tracker[destination][0] or time_cost < tracker[destination][1]:
+                        tracker[destination] = (current_stop, time_cost, departure.arrival_time, departure.line)
+                        q.put(destination, time_cost + current_stop.getHeuristic(destination))
         current_time += tracker[current_stop][1]
     return

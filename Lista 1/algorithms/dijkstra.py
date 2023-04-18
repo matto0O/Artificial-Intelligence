@@ -48,16 +48,20 @@ def dijkstra(graph, start, end, departure_time):
             print(f"Czas wykonywania obliczeń - {time.time()-computing_time_start}s")
             return
         
-        collection = set(filter(lambda x: (x.departure_time>=tracker[current_stop][2]), current_stop.departures))
+        collection = sorted(filter(lambda x: (x.departure_time>=tracker[current_stop][2]), current_stop.departures), key=lambda x: x.departure_time)
+
+        checked_departures = set()
 
         for departure in collection:
             # all departures that take place after current_stop arrival time
-            destination = findStopOfName(graph, departure.destination)
-            if destination.name in [current_stop.name, tracker[current_stop][0]]:
-                continue
-            time_cost = departure.timeCriteria(time_total)
+            x = (departure.line, departure.destination)
+            if x not in checked_departures:
+                checked_departures.add(x)
+                destination = findStopOfName(graph, departure.destination)
+                if destination.name not in [current_stop.name, tracker[current_stop][0]]:
+                    time_cost = departure.timeCriteria(time_total)
 
-            if not tracker[destination][0] or time_cost < tracker[destination][1]:
-                tracker[destination] = (current_stop, time_cost, departure.arrival_time)
-                q.put(destination, time_cost)
+                    if not tracker[destination][0] or time_cost < tracker[destination][1]:
+                        tracker[destination] = (current_stop, time_cost, departure.arrival_time)
+                        q.put(destination, time_cost)
     return

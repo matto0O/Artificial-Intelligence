@@ -3,10 +3,14 @@ import heapq
 from math import sqrt
 
 def findDepartureBetween(start, stop, arrival):
+    #return [departure for departure in start.departures if (departure.destination==stop and departure.arrival_time==arrival)][0]
     for departure in start.departures:
         if departure.destination==stop and departure.arrival_time==arrival:
             return departure
     exit(1)
+
+def checkForTransferAvoidance(tracker):
+    pass
 
 def timeToTotal(time):
     split = time[:6].split(':')
@@ -80,7 +84,7 @@ class Stop():
         return self.name == str(__o)
     
     def __lt__(self, _):
-        return self.__hash__
+        return self.__hash__()
 
     def __hash__(self):
         return hash(self.name)

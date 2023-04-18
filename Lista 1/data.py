@@ -24,6 +24,9 @@ def fetchEdges(graph):
                 stop.addDeparture(elem)
                 break
 
+def fetchLines():
+    pass
+
 def saveGraph(graph):
     print("Saving...")
     with open(FILENAME, "wb") as file:
