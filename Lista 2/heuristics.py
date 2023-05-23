@@ -1,15 +1,13 @@
+def _taken(board):
+    taken = 0
+    for row in range(board.n):
+        for col in range(board.n):
+            if board.board[row][col] in [1,2]:
+                taken += 1
+    return taken / board.n ** 2
+            
+
 def count_tiles(board, player):
-    """
-    Heuristic function that returns a score based on the number of tiles
-    occupied by the given player. More tiles result in a higher score.
-
-    Parameters:
-    - board (Board)     : the current board
-    - player (int)      : player for whom tiles are counted
-
-    Returns:
-    - score (int)       : the score for the move
-    """
     score = 0
     for row in range(board.n):
         for col in range(board.n):
@@ -19,26 +17,28 @@ def count_tiles(board, player):
                 score -= 1
     return score
 
-def progressive_aggressiveness(board, player):
-    """
-    Heuristic function that returns a score based on the number of tiles
-    occupied by the given player. More tiles result in a higher score.
+def tile_value(board, player):
+    weight = [
+        [ 10,  -5,   5,   3,   3,   5,  -5,  10],
+        [ -5,  -5,  -3,  -1,  -1,  -3,  -5,  -5],
+        [  5,  -3,   3,   3,   3,   3,  -5,   5],
+        [  3,  -1,   2,   1,   1,   2,  -1,   3],
+        [  3,  -1,   2,   1,   1,   2,  -1,   3],
+        [  5,  -5,   3,   3,   3,   3,  -5,   5],
+        [ -5,  -5,  -3,  -1,  -1,  -3,  -5,  -5],
+        [ 10,  -5,   5,   3,   3,   5,  -5,  10]
+    ]
 
-    Parameters:
-    - board (Board)     : the current board
-    - player (int)      : player for whom tiles are counted
-
-    Returns:
-    - score (int)       : the score for the move
-    """
     score = 0
-    total_tiles_taken = 0
     for row in range(board.n):
         for col in range(board.n):
             if board.board[row][col] == (player + 1):
-                score += 1 
+                score += weight[row][col]
             elif board.board[row][col] != 0:
-                score -= 1
-            else:
-                total_tiles_taken += 1
-    return score * ((total_tiles_taken - score) ** 2)
+                score -= weight[row][col]
+    return score
+
+def progressive_aggressiveness(board, player):
+    coeff = _taken(board)
+    prim_coeff = 1 - coeff
+    return tile_value(board, player) * prim_coeff + count_tiles(board, player) * coeff

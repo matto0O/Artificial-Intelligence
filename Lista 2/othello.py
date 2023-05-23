@@ -1,8 +1,10 @@
 import turtle, random
 from algorithms import minimax, abpruning
-from heuristics import count_tiles
+from heuristics import count_tiles, tile_value, progressive_aggressiveness
 from board import Board
 from copy import deepcopy
+from time import time, sleep
+
 
 # Define all the possible directions in which a player's move can flip 
 # their adversary's tiles as constant (0 – the current row/column, 
@@ -210,6 +212,27 @@ class Othello(Board):
         turtle.onscreenclick(self.play)
         turtle.mainloop()
 
+    def ai_vs_ai(self):
+        while self.has_legal_move() and sum(self.num_tiles) < self.n ** 2:
+            t = time()
+            print('Computer ' + str(self.current_player + 1) + '\'s turn...')
+            sleep(0.5)
+
+            # Alpha-beta pruning
+            move, _ = abpruning(deepcopy(self), self.current_player, DEPTH*2, progressive_aggressiveness)
+
+            # # Minimax algorithm
+            # move, _ = minimax(deepcopy(self), self.current_player, DEPTH*2, progressive_aggressiveness)
+
+            print(f"Selected move: {move}")
+            print(f"The move took {time()-t}")
+            self.move = move
+            self.make_move()
+            self.current_player = int(not self.current_player)
+
+        print(self)
+        self.report_result()
+
     def play(self, x, y):
         ''' Method: play
             Parameters: self, x (float), y (float)
@@ -242,7 +265,7 @@ class Othello(Board):
             self.current_player = 1
             if self.has_legal_move():
                 print('Computer\'s turn.')
-                self.make_minimax_move()
+                self.make_alpha_beta_move()
                 self.current_player = 0
                 if self.has_legal_move():  
                     break
@@ -279,8 +302,15 @@ class Othello(Board):
             self.make_move()
 
     def make_minimax_move(self):
-        self.move = minimax(deepcopy(self), self.current_player, DEPTH, count_tiles)[0]
-        print(self.move)
+        t = time()
+        self.move = minimax(deepcopy(self), self.current_player, DEPTH*2, count_tiles)[0]
+        print(f"Minimax move time: {time()-t}")
+        self.make_move()
+
+    def make_alpha_beta_move(self):
+        t = time()
+        self.move = abpruning(deepcopy(self), self.current_player, DEPTH*2, count_tiles)[0]
+        print(f"Alpha-beta pruning move time: {time()-t}")
         self.make_move()
 
 
