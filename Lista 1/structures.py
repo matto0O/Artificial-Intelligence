@@ -136,6 +136,6 @@ def preetifyResult(res):
     for departure in res:
         transfers.add(departure.line)
         print(f"{departure.start.rjust(40)} -> {departure.destination.ljust(40)} linia {str(departure.line).ljust(3)} {str(toReadableTime(departure.departure_time)).ljust(5)} -> {str(toReadableTime(departure.arrival_time)).rjust(5)}")
-    #print(f"Docierasz do przystanku o {toReadableTime(res[-1].arrival_time)} po {res[-1].departure_time-res[0].departure_time} minutach.")
-    print(f"Ilość przesiadek - {len(transfers)-1}")
+    print(f"Docierasz do przystanku o {toReadableTime(res[-1].arrival_time)} po {res[-1].departure_time-res[0].departure_time} minutach.")
+    print(f"Ilość pojazdów - {len(transfers)-1}")
     print("".ljust(110, '='))

@@ -29,7 +29,7 @@ def asaTimeCriteria(graph, start, end, departure_time):
     q.put(start_node, 0)
     visited = set()
 
-    tracker = {stop: (Stop, float('inf'), int,str) for stop in graph}
+    tracker = {stop: (Stop, float('inf'), int,str, float('inf')) for stop in graph}
     # dict storing current best paths to a node, where:
     # first elem - path to node
     # second elem - path length
@@ -46,7 +46,7 @@ def asaTimeCriteria(graph, start, end, departure_time):
         if current_stop == stop_node:
             # path reconstruction
             stopB = current_stop
-            #tracker = checkForTransferAvoidance(tracker, stopB, start)
+            tracker = checkForTransferAvoidance(tracker, stopB, start)
             stopA = tracker[current_stop][0]
             departures = []
             while stopA != start_node:
@@ -143,8 +143,6 @@ def asaTransferCriteria(graph, start, end, departure_time):
             
                 if destination.name not in [current_stop.name, tracker[current_stop][0]]:
                     time_cost = departure.transferCriteria(current_time, transfer)
-                    if departure.start=="Bajana":
-                        print(departure.line, departure.start, departure.destination, time_cost)
             
                     if not tracker[destination][0] or time_cost < tracker[destination][1]:
                         tracker[destination] = (current_stop, time_cost, departure.arrival_time, departure.line)
