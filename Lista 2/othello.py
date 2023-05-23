@@ -16,6 +16,8 @@ MOVE_DIRS = [(-1, -1), (-1, 0), (-1, +1),
 
 DEPTH = 2
 
+ABP = False
+
 class Othello(Board):
     ''' Othello class.
         Attributes: current_player, an integer 0 or 1 to represent two 
@@ -265,7 +267,10 @@ class Othello(Board):
             self.current_player = 1
             if self.has_legal_move():
                 print('Computer\'s turn.')
-                self.make_alpha_beta_move()
+                if ABP:
+                    self.make_alpha_beta_move()
+                else:
+                    self.make_minimax_move()
                 self.current_player = 0
                 if self.has_legal_move():  
                     break

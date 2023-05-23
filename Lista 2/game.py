@@ -10,7 +10,8 @@ def main():
     # The user makes a move by clicking one of the squares on the board
     # The computer makes a random legal move every time
     # Game is over when there are no more lagal moves or the board is full
-    game.ai_vs_ai()
+    #game.ai_vs_ai()
+    game.run()
 
 
 main()

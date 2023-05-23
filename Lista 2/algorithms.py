@@ -14,7 +14,6 @@ def minimax(board, player, depth, rating):
             if maxEval < eval:
                 maxEval = eval
                 bestMove = move
-                print(move, maxEval, eval, bestMove)
         return bestMove, maxEval
     
     minEval = float('inf')
