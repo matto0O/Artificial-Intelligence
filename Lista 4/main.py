@@ -41,14 +41,14 @@ def classify(xt, xv, yt, yv, prep_list):
         models.append((GaussianNB(var_smoothing=eval(value)), f"GNB vs={value}", 1))
 
     for md in dtc_range:
-        models.append((DecisionTreeClassifier(max_depth=md), f"DTC md={md}", 2))
+        models.append((DecisionTreeClassifier(max_depth=md, random_state=10), f"DTC md={md}", 2))
 
     for mss in dtc_range:
-        models.append((DecisionTreeClassifier(min_samples_split=mss), f"DTC mss={mss}", 3))
+        models.append((DecisionTreeClassifier(min_samples_split=mss, random_state=10), f"DTC mss={mss}", 3))
 
     for mixed_md in dtc_mixed_range:
         for mixed_mss in dtc_mixed_range:
-            models.append((DecisionTreeClassifier(max_depth=mixed_md, min_samples_split=mixed_mss), f"DTC md={mixed_md} mss={mixed_mss}", 4))
+            models.append((DecisionTreeClassifier(max_depth=mixed_md, min_samples_split=mixed_mss, random_state=10), f"DTC md={mixed_md} mss={mixed_mss}", 4))
 
     for prep in prep_list:
         xt, xv = prep(xt, xv)
@@ -67,6 +67,7 @@ def classify(xt, xv, yt, yv, prep_list):
         f1_values = tuple(map(lambda x: x[-1],part_results))
         labels = tuple(map(lambda x: x[0],part_results))
         y_pos = np.arange(len(part_results))
+        
         plt.figure(figsize=(10,5))
         plt.bar(y_pos,f1_values)
         plt.xticks(y_pos, labels, rotation=90)
@@ -80,7 +81,6 @@ def classify(xt, xv, yt, yv, prep_list):
     for i in range(1, 5):
         best_in_group = tuple(filter(lambda x: x[2]==i, ordered_models))[0]
         best_in_group_matrix = best_in_group[3]
-        print(type(best_in_group_matrix), best_in_group_matrix)
         sns.heatmap(best_in_group_matrix, annot=True, cbar=False, linewidths=0.5)
         plt.title(f"Confusion matrix - {best_in_group[0]} {best_in_group[1]}")
         plt.show()
